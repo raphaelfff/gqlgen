@@ -1,0 +1,8 @@
+extend type Query {
+    personWithGetterHaser: PersonWithGetterHaser
+}
+
+type PersonWithGetterHaser {
+    name: String
+    age: Int
+}

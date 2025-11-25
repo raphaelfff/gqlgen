@@ -90,6 +90,7 @@ type Stub struct {
 		EmbeddedCase2                    func(ctx context.Context) (*EmbeddedCase2, error)
 		EmbeddedCase3                    func(ctx context.Context) (*EmbeddedCase3, error)
 		EnumInInput                      func(ctx context.Context, input *InputWithEnumValue) (EnumTest, error)
+		PersonWithGetterHaser            func(ctx context.Context) (*PersonWithGetterHaser, error)
 		SearchProducts                   func(ctx context.Context, filters map[string]interface{}) ([]string, error)
 		SearchRequired                   func(ctx context.Context, filters map[string]interface{}) ([]string, error)
 		SearchProductsNormal             func(ctx context.Context, filters map[string]any) ([]string, error)
@@ -418,6 +419,9 @@ func (r *stubQuery) EmbeddedCase3(ctx context.Context) (*EmbeddedCase3, error) {
 }
 func (r *stubQuery) EnumInInput(ctx context.Context, input *InputWithEnumValue) (EnumTest, error) {
 	return r.QueryResolver.EnumInInput(ctx, input)
+}
+func (r *stubQuery) PersonWithGetterHaser(ctx context.Context) (*PersonWithGetterHaser, error) {
+	return r.QueryResolver.PersonWithGetterHaser(ctx)
 }
 func (r *stubQuery) SearchProducts(ctx context.Context, filters map[string]interface{}) ([]string, error) {
 	return r.QueryResolver.SearchProducts(ctx, filters)

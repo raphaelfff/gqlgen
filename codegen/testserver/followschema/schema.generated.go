@@ -65,6 +65,7 @@ type QueryResolver interface {
 	EmbeddedCase2(ctx context.Context) (*EmbeddedCase2, error)
 	EmbeddedCase3(ctx context.Context) (*EmbeddedCase3, error)
 	EnumInInput(ctx context.Context, input *InputWithEnumValue) (EnumTest, error)
+	PersonWithGetterHaser(ctx context.Context) (*PersonWithGetterHaser, error)
 	SearchProducts(ctx context.Context, filters map[string]interface{}) ([]string, error)
 	SearchRequired(ctx context.Context, filters map[string]interface{}) ([]string, error)
 	SearchProductsNormal(ctx context.Context, filters map[string]any) ([]string, error)
@@ -3169,6 +3170,43 @@ func (ec *executionContext) fieldContext_Query_enumInInput(ctx context.Context, 
 	if fc.Args, err = ec.field_Query_enumInInput_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_personWithGetterHaser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_personWithGetterHaser,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().PersonWithGetterHaser(ctx)
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			return ec._fieldMiddleware(ctx, nil, next)
+		},
+		ec.marshalOPersonWithGetterHaser2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋcodegenᚋtestserverᚋfollowschemaᚐPersonWithGetterHaser,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_personWithGetterHaser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "name":
+				return ec.fieldContext_PersonWithGetterHaser_name(ctx, field)
+			case "age":
+				return ec.fieldContext_PersonWithGetterHaser_age(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PersonWithGetterHaser", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -6988,6 +7026,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "personWithGetterHaser":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_personWithGetterHaser(ctx, field)
 				return res
 			}
 
