@@ -211,7 +211,9 @@ func (b *builder) bindField(obj *Object, f *Field) (errret error) {
 		f.Args = newArgs
 		f.TypeReference = tr
 
-		// Check if this is a getter method (GetX) and if a corresponding haser (HasX) exists
+		// Check if this is a getter method (GetX) and if a corresponding haser (HasX) exists.
+		// Note: We only track hasers when paired with getters. If only a haser exists (no getter),
+		// it will be bound directly as a boolean-returning method, not as a null-check.
 		if strings.HasPrefix(target.Name(), "Get") {
 			fieldNameWithoutGet := strings.TrimPrefix(target.Name(), "Get")
 			if haserMethod := b.findHaserMethod(obj.Type, fieldNameWithoutGet); haserMethod != nil {
@@ -389,7 +391,8 @@ func (b *builder) findBindMethoderTarget(
 	return haserMatch, nil
 }
 
-// findHaserMethod looks for a HasX method for the given field name
+// findHaserMethod looks for a HasX method for the given field name.
+// For example, if name is "Name", this will search for a "HasName" method.
 func (b *builder) findHaserMethod(in types.Type, name string) *types.Func {
 	haserName := "Has" + name
 	
