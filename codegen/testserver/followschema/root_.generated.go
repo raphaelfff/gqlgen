@@ -33,9 +33,12 @@ type Config struct {
 
 type ResolverRoot interface {
 	BackedByInterface() BackedByInterfaceResolver
+	Cat() CatResolver
 	DeferModel() DeferModelResolver
+	Dog() DogResolver
 	Errors() ErrorsResolver
 	ForcedResolver() ForcedResolverResolver
+	Horse() HorseResolver
 	ModelMethods() ModelMethodsResolver
 	Mutation() MutationResolver
 	OverlappingFields() OverlappingFieldsResolver

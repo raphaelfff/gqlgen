@@ -109,6 +109,62 @@ func parseScope(input any, packageName string) (*types.Scope, error) {
 	return pkg.Scope(), nil
 }
 
+func TestFindFieldWithGetterAndHaser(t *testing.T) {
+	input := `
+package test
+
+type WithGetter struct {
+	name string
+}
+
+func (w WithGetter) GetName() string {
+	return w.name
+}
+
+type WithBoth struct {
+	foobar *string
+}
+
+func (w WithBoth) GetFoobar() *string {
+	return w.foobar
+}
+
+func (w WithBoth) HasFoobar() bool {
+	return w.foobar != nil
+}
+`
+	scope, err := parseScope(input, "test")
+	require.NoError(t, err)
+
+	withGetter := scope.Lookup("WithGetter").Type().(*types.Named)
+	withBoth := scope.Lookup("WithBoth").Type().(*types.Named)
+
+	tests := []struct {
+		Name        string
+		Named       *types.Named
+		Field       string
+		Expected    string
+		ShouldError bool
+	}{
+		{"Finds getter method for field name", withGetter, "Name", "GetName", false},
+		{"Prefers getter over haser when both exist", withBoth, "Foobar", "GetFoobar", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			b := builder{Config: &config.Config{}}
+			target, err := b.findBindTarget(tt.Named, tt.Field)
+			if tt.ShouldError {
+				require.Nil(t, target, tt.Name)
+				require.Error(t, err, tt.Name)
+			} else {
+				require.NoError(t, err, tt.Name)
+				require.Equal(t, tt.Expected, target.Name(), tt.Name)
+			}
+		})
+	}
+}
+
 func TestEqualFieldName(t *testing.T) {
 	tt := []struct {
 		Name     string

@@ -17,8 +17,28 @@ func (r *backedByInterfaceResolver) ID(ctx context.Context, obj BackedByInterfac
 	panic("not implemented")
 }
 
+// Species is the resolver for the species field.
+func (r *catResolver) Species(ctx context.Context, obj *Cat) (string, error) {
+	panic("not implemented")
+}
+
+// Size is the resolver for the size field.
+func (r *catResolver) Size(ctx context.Context, obj *Cat) (*Size, error) {
+	panic("not implemented")
+}
+
 // Values is the resolver for the values field.
 func (r *deferModelResolver) Values(ctx context.Context, obj *DeferModel) ([]string, error) {
+	panic("not implemented")
+}
+
+// Species is the resolver for the species field.
+func (r *dogResolver) Species(ctx context.Context, obj *Dog) (string, error) {
+	panic("not implemented")
+}
+
+// Size is the resolver for the size field.
+func (r *dogResolver) Size(ctx context.Context, obj *Dog) (*Size, error) {
 	panic("not implemented")
 }
 
@@ -49,6 +69,16 @@ func (r *errorsResolver) E(ctx context.Context, obj *Errors) (*Error, error) {
 
 // Field is the resolver for the field field.
 func (r *forcedResolverResolver) Field(ctx context.Context, obj *ForcedResolver) (*Circle, error) {
+	panic("not implemented")
+}
+
+// Species is the resolver for the species field.
+func (r *horseResolver) Species(ctx context.Context, obj *Horse) (string, error) {
+	panic("not implemented")
+}
+
+// Size is the resolver for the size field.
+func (r *horseResolver) Size(ctx context.Context, obj *Horse) (*Size, error) {
 	panic("not implemented")
 }
 
@@ -587,14 +617,23 @@ func (r *Resolver) BackedByInterface() BackedByInterfaceResolver {
 	return &backedByInterfaceResolver{r}
 }
 
+// Cat returns CatResolver implementation.
+func (r *Resolver) Cat() CatResolver { return &catResolver{r} }
+
 // DeferModel returns DeferModelResolver implementation.
 func (r *Resolver) DeferModel() DeferModelResolver { return &deferModelResolver{r} }
+
+// Dog returns DogResolver implementation.
+func (r *Resolver) Dog() DogResolver { return &dogResolver{r} }
 
 // Errors returns ErrorsResolver implementation.
 func (r *Resolver) Errors() ErrorsResolver { return &errorsResolver{r} }
 
 // ForcedResolver returns ForcedResolverResolver implementation.
 func (r *Resolver) ForcedResolver() ForcedResolverResolver { return &forcedResolverResolver{r} }
+
+// Horse returns HorseResolver implementation.
+func (r *Resolver) Horse() HorseResolver { return &horseResolver{r} }
 
 // ModelMethods returns ModelMethodsResolver implementation.
 func (r *Resolver) ModelMethods() ModelMethodsResolver { return &modelMethodsResolver{r} }
@@ -635,9 +674,12 @@ func (r *Resolver) WrappedMap() WrappedMapResolver { return &wrappedMapResolver{
 func (r *Resolver) WrappedSlice() WrappedSliceResolver { return &wrappedSliceResolver{r} }
 
 type backedByInterfaceResolver struct{ *Resolver }
+type catResolver struct{ *Resolver }
 type deferModelResolver struct{ *Resolver }
+type dogResolver struct{ *Resolver }
 type errorsResolver struct{ *Resolver }
 type forcedResolverResolver struct{ *Resolver }
+type horseResolver struct{ *Resolver }
 type modelMethodsResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type overlappingFieldsResolver struct{ *Resolver }
@@ -650,3 +692,16 @@ type subscriptionResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
 type wrappedMapResolver struct{ *Resolver }
 type wrappedSliceResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	type Resolver struct{}
+func (r *queryResolver) PersonWithGetterHaser(ctx context.Context) (*PersonWithGetterHaser, error) {
+	panic("not implemented")
+}
+*/

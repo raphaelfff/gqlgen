@@ -160,16 +160,21 @@ func (ec *executionContext) {{ $field.FieldContextFunc }}({{ if not $field.Args 
 			return nil, fmt.Errorf("unexpected type %T for field %s", v, {{ .Name | quote}})
 		}
 	{{- else if .IsMethod -}}
+		{{- if .GoHaserName }}
+		if !{{.GoReceiverName}}.{{.GoHaserName}}({{ .CallArgs }}) {
+			return nil, nil
+		}
+		{{ end }}
 		{{- if .VOkFunc -}}
-			v, ok := {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }})
-			if !ok {
-				return nil, nil
-			}
-			return v, nil
+		v, ok := {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }})
+		if !ok {
+			return nil, nil
+		}
+		return v, nil
 		{{- else if .NoErr -}}
-			return {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }}), nil
+		return {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }}), nil
 		{{- else -}}
-			return {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }})
+		return {{.GoReceiverName}}.{{.GoFieldName}}({{ .CallArgs }})
 		{{- end -}}
 	{{- else if .IsVariable -}}
 		return {{.GoReceiverName}}.{{.GoFieldName}}, nil

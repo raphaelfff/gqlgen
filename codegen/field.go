@@ -26,6 +26,7 @@ type Field struct {
 	GoFieldType      GoFieldType      // The field type in go, if any
 	GoReceiverName   string           // The name of method & var receiver in go, if any
 	GoFieldName      string           // The name of the method or var in go, if any
+	GoHaserName      string           // The name of the haser method (HasX), if any
 	IsResolver       bool             // Does this field need a resolver
 	Args             []*FieldArgument // A list of arguments to be passed to this field
 	MethodHasContext bool             // If this is bound to a go method, does the method also take a context
@@ -210,6 +211,26 @@ func (b *builder) bindField(obj *Object, f *Field) (errret error) {
 		f.Args = newArgs
 		f.TypeReference = tr
 
+		// Check if this is a getter method (GetX) and if a corresponding haser (HasX) exists.
+		// Only use the haser if the GraphQL field is nullable (not NonNull).
+		if strings.HasPrefix(target.Name(), "Get") && !f.Type.NonNull {
+			fieldNameWithoutGet := strings.TrimPrefix(target.Name(), "Get")
+			if haserMethod := b.findHaserMethod(obj.Type, fieldNameWithoutGet); haserMethod != nil {
+				// Validate the haser method signature: should return bool with no params (except optional context)
+				haserSig := haserMethod.Type().(*types.Signature)
+				if haserSig.Results().Len() == 1 && haserSig.Results().At(0).Type().String() == "bool" {
+					// Check params - should have no params or only context
+					validHaser := haserSig.Params().Len() == 0
+					if haserSig.Params().Len() == 1 && haserSig.Params().At(0).Type().String() == "context.Context" {
+						validHaser = true
+					}
+					if validHaser {
+						f.GoHaserName = haserMethod.Name()
+					}
+				}
+			}
+		}
+
 		return nil
 
 	case *types.Var:
@@ -323,21 +344,70 @@ func (b *builder) findBindMethoderTarget(
 	methodCount int,
 	name string,
 ) (types.Object, error) {
-	var found types.Object
+	var directMatch types.Object
+	var getterMatch types.Object
+	
+	// Try getter pattern (GetName)
+	getterName := "Get" + name
+	
 	for i := range methodCount {
 		method := methodFunc(i)
-		if !method.Exported() || !strings.EqualFold(method.Name(), name) {
+		if !method.Exported() {
 			continue
 		}
-
-		if found != nil {
-			return nil, fmt.Errorf("found more than one matching method to bind for %s", name)
+		
+		// Check for exact match (highest priority)
+		if strings.EqualFold(method.Name(), name) {
+			if directMatch != nil {
+				return nil, fmt.Errorf("found more than one matching method to bind for %s", name)
+			}
+			directMatch = method
+		} else if strings.EqualFold(method.Name(), getterName) {
+			// Check for getter pattern (medium priority)
+			if getterMatch != nil {
+				return nil, fmt.Errorf("found more than one getter method to bind for %s", name)
+			}
+			getterMatch = method
 		}
-
-		found = method
 	}
 
-	return found, nil
+	// Return with priority: direct match > getter
+	if directMatch != nil {
+		return directMatch, nil
+	}
+	if getterMatch != nil {
+		return getterMatch, nil
+	}
+	return nil, nil
+}
+
+// findHaserMethod looks for a HasX method for the given field name.
+// For example, if name is "Name", this will search for a "HasName" method.
+func (b *builder) findHaserMethod(in types.Type, name string) *types.Func {
+	haserName := "Has" + name
+	
+	switch t := in.(type) {
+	case *types.Named:
+		if _, ok := t.Underlying().(*types.Interface); ok {
+			return b.findHaserMethod(t.Underlying(), name)
+		}
+		
+		for i := 0; i < t.NumMethods(); i++ {
+			method := t.Method(i)
+			if method.Exported() && strings.EqualFold(method.Name(), haserName) {
+				return method
+			}
+		}
+	case *types.Interface:
+		for i := 0; i < t.NumMethods(); i++ {
+			method := t.Method(i)
+			if method.Exported() && strings.EqualFold(method.Name(), haserName) {
+				return method
+			}
+		}
+	}
+	
+	return nil
 }
 
 func (b *builder) findBindFieldTarget(in types.Type, name string) (types.Object, error) {
