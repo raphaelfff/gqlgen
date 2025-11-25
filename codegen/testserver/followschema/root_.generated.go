@@ -286,11 +286,6 @@ type ComplexityRoot struct {
 		FieldScalarMarshal func(childComplexity int) int
 	}
 
-	PersonWithGetterHaser struct {
-		GetAge  func(childComplexity int) int
-		GetName func(childComplexity int) int
-	}
-
 	Pet struct {
 		Friends func(childComplexity int, limit *int) int
 		ID      func(childComplexity int) int
@@ -381,7 +376,6 @@ type ComplexityRoot struct {
 		OptionalUnion                    func(childComplexity int) int
 		Overlapping                      func(childComplexity int) int
 		Panics                           func(childComplexity int) int
-		PersonWithGetterHaser            func(childComplexity int) int
 		PrimitiveObject                  func(childComplexity int) int
 		PrimitiveStringObject            func(childComplexity int) int
 		PtrToAnyContainer                func(childComplexity int) int
@@ -1160,20 +1154,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Panics.FieldScalarMarshal(childComplexity), true
 
-	case "PersonWithGetterHaser.age":
-		if e.complexity.PersonWithGetterHaser.GetAge == nil {
-			break
-		}
-
-		return e.complexity.PersonWithGetterHaser.GetAge(childComplexity), true
-
-	case "PersonWithGetterHaser.name":
-		if e.complexity.PersonWithGetterHaser.GetName == nil {
-			break
-		}
-
-		return e.complexity.PersonWithGetterHaser.GetName(childComplexity), true
-
 	case "Pet.friends":
 		if e.complexity.Pet.Friends == nil {
 			break
@@ -1759,13 +1739,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Panics(childComplexity), true
-
-	case "Query.personWithGetterHaser":
-		if e.complexity.Query.PersonWithGetterHaser == nil {
-			break
-		}
-
-		return e.complexity.Query.PersonWithGetterHaser(childComplexity), true
 
 	case "Query.primitiveObject":
 		if e.complexity.Query.PrimitiveObject == nil {
@@ -2757,10 +2730,6 @@ type Panics {
 	fieldFuncMarshal(u: [MarshalPanic!]!): [MarshalPanic!]!
 	argUnmarshal(u: [MarshalPanic!]!): Boolean!
 }
-type PersonWithGetterHaser {
-	name: String
-	age: Int
-}
 type Pet {
 	id: Int!
 	friends(limit: Int): [Pet!] @goField(forceResolver: true)
@@ -2826,7 +2795,6 @@ type Query {
 	embeddedCase2: EmbeddedCase2
 	embeddedCase3: EmbeddedCase3
 	enumInInput(input: InputWithEnumValue): EnumTest!
-	personWithGetterHaser: PersonWithGetterHaser
 	searchProducts(query: String, category: String, minPrice: Int): [String!]!
 	searchRequired(name: String!, age: Int!): [String!]!
 	searchProductsNormal(filters: SearchFilters): [String!]!

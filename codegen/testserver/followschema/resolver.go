@@ -322,11 +322,6 @@ func (r *queryResolver) EnumInInput(ctx context.Context, input *InputWithEnumVal
 	panic("not implemented")
 }
 
-// PersonWithGetterHaser is the resolver for the personWithGetterHaser field.
-func (r *queryResolver) PersonWithGetterHaser(ctx context.Context) (*PersonWithGetterHaser, error) {
-	panic("not implemented")
-}
-
 // SearchProducts is the resolver for the searchProducts field.
 func (r *queryResolver) SearchProducts(ctx context.Context, filters map[string]interface{}) ([]string, error) {
 	panic("not implemented")
@@ -706,4 +701,7 @@ type wrappedSliceResolver struct{ *Resolver }
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
 /*
 	type Resolver struct{}
+func (r *queryResolver) PersonWithGetterHaser(ctx context.Context) (*PersonWithGetterHaser, error) {
+	panic("not implemented")
+}
 */

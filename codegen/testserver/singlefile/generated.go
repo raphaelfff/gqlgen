@@ -42,9 +42,12 @@ type Config struct {
 
 type ResolverRoot interface {
 	BackedByInterface() BackedByInterfaceResolver
+	Cat() CatResolver
 	DeferModel() DeferModelResolver
+	Dog() DogResolver
 	Errors() ErrorsResolver
 	ForcedResolver() ForcedResolverResolver
+	Horse() HorseResolver
 	ModelMethods() ModelMethodsResolver
 	Mutation() MutationResolver
 	OverlappingFields() OverlappingFieldsResolver
@@ -507,8 +510,16 @@ type ComplexityRoot struct {
 type BackedByInterfaceResolver interface {
 	ID(ctx context.Context, obj BackedByInterface) (string, error)
 }
+type CatResolver interface {
+	Species(ctx context.Context, obj *Cat) (string, error)
+	Size(ctx context.Context, obj *Cat) (*Size, error)
+}
 type DeferModelResolver interface {
 	Values(ctx context.Context, obj *DeferModel) ([]string, error)
+}
+type DogResolver interface {
+	Species(ctx context.Context, obj *Dog) (string, error)
+	Size(ctx context.Context, obj *Dog) (*Size, error)
 }
 type ErrorsResolver interface {
 	A(ctx context.Context, obj *Errors) (*Error, error)
@@ -519,6 +530,10 @@ type ErrorsResolver interface {
 }
 type ForcedResolverResolver interface {
 	Field(ctx context.Context, obj *ForcedResolver) (*Circle, error)
+}
+type HorseResolver interface {
+	Species(ctx context.Context, obj *Horse) (string, error)
+	Size(ctx context.Context, obj *Horse) (*Size, error)
 }
 type ModelMethodsResolver interface {
 	ResolverField(ctx context.Context, obj *ModelMethods) (bool, error)
@@ -4795,7 +4810,7 @@ func (ec *executionContext) _Cat_species(ctx context.Context, field graphql.Coll
 		field,
 		ec.fieldContext_Cat_species,
 		func(ctx context.Context) (any, error) {
-			return obj.Species, nil
+			return ec.resolvers.Cat().Species(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -4810,8 +4825,8 @@ func (ec *executionContext) fieldContext_Cat_species(_ context.Context, field gr
 	fc = &graphql.FieldContext{
 		Object:     "Cat",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -4826,7 +4841,7 @@ func (ec *executionContext) _Cat_size(ctx context.Context, field graphql.Collect
 		field,
 		ec.fieldContext_Cat_size,
 		func(ctx context.Context) (any, error) {
-			return obj.Size, nil
+			return ec.resolvers.Cat().Size(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -4841,8 +4856,8 @@ func (ec *executionContext) fieldContext_Cat_size(_ context.Context, field graph
 	fc = &graphql.FieldContext{
 		Object:     "Cat",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "height":
@@ -5458,7 +5473,7 @@ func (ec *executionContext) _Dog_species(ctx context.Context, field graphql.Coll
 		field,
 		ec.fieldContext_Dog_species,
 		func(ctx context.Context) (any, error) {
-			return obj.Species, nil
+			return ec.resolvers.Dog().Species(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -5473,8 +5488,8 @@ func (ec *executionContext) fieldContext_Dog_species(_ context.Context, field gr
 	fc = &graphql.FieldContext{
 		Object:     "Dog",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -5489,7 +5504,7 @@ func (ec *executionContext) _Dog_size(ctx context.Context, field graphql.Collect
 		field,
 		ec.fieldContext_Dog_size,
 		func(ctx context.Context) (any, error) {
-			return obj.Size, nil
+			return ec.resolvers.Dog().Size(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -5504,8 +5519,8 @@ func (ec *executionContext) fieldContext_Dog_size(_ context.Context, field graph
 	fc = &graphql.FieldContext{
 		Object:     "Dog",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "height":
@@ -6142,7 +6157,7 @@ func (ec *executionContext) _Horse_species(ctx context.Context, field graphql.Co
 		field,
 		ec.fieldContext_Horse_species,
 		func(ctx context.Context) (any, error) {
-			return obj.Species, nil
+			return ec.resolvers.Horse().Species(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -6157,8 +6172,8 @@ func (ec *executionContext) fieldContext_Horse_species(_ context.Context, field 
 	fc = &graphql.FieldContext{
 		Object:     "Horse",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -6173,7 +6188,7 @@ func (ec *executionContext) _Horse_size(ctx context.Context, field graphql.Colle
 		field,
 		ec.fieldContext_Horse_size,
 		func(ctx context.Context) (any, error) {
-			return obj.Size, nil
+			return ec.resolvers.Horse().Size(ctx, obj)
 		},
 		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
 			return ec._fieldMiddleware(ctx, obj, next)
@@ -6188,8 +6203,8 @@ func (ec *executionContext) fieldContext_Horse_size(_ context.Context, field gra
 	fc = &graphql.FieldContext{
 		Object:     "Horse",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "height":
@@ -15898,19 +15913,81 @@ func (ec *executionContext) _Cat(ctx context.Context, sel ast.SelectionSet, obj 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Cat")
 		case "species":
-			out.Values[i] = ec._Cat_species(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cat_species(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "size":
-			out.Values[i] = ec._Cat_size(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cat_size(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "catBreed":
 			out.Values[i] = ec._Cat_catBreed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -16350,19 +16427,81 @@ func (ec *executionContext) _Dog(ctx context.Context, sel ast.SelectionSet, obj 
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Dog")
 		case "species":
-			out.Values[i] = ec._Dog_species(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dog_species(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "size":
-			out.Values[i] = ec._Dog_size(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Dog_size(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "dogBreed":
 			out.Values[i] = ec._Dog_dogBreed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -16958,19 +17097,81 @@ func (ec *executionContext) _Horse(ctx context.Context, sel ast.SelectionSet, ob
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Horse")
 		case "species":
-			out.Values[i] = ec._Horse_species(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Horse_species(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "size":
-			out.Values[i] = ec._Horse_size(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Horse_size(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "horseBreed":
 			out.Values[i] = ec._Horse_horseBreed(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -21687,6 +21888,10 @@ func (ec *executionContext) marshalNShapeUnion2githubᚗcomᚋ99designsᚋgqlgen
 		return graphql.Null
 	}
 	return ec._ShapeUnion(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSize2githubᚗcomᚋ99designsᚋgqlgenᚋcodegenᚋtestserverᚋsinglefileᚐSize(ctx context.Context, sel ast.SelectionSet, v Size) graphql.Marshaler {
+	return ec._Size(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNSize2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋcodegenᚋtestserverᚋsinglefileᚐSize(ctx context.Context, sel ast.SelectionSet, v *Size) graphql.Marshaler {
