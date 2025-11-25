@@ -212,9 +212,8 @@ func (b *builder) bindField(obj *Object, f *Field) (errret error) {
 		f.TypeReference = tr
 
 		// Check if this is a getter method (GetX) and if a corresponding haser (HasX) exists.
-		// Note: We only track hasers when paired with getters. If only a haser exists (no getter),
-		// it will be bound directly as a boolean-returning method, not as a null-check.
-		if strings.HasPrefix(target.Name(), "Get") {
+		// Only use the haser if the GraphQL field is nullable (not NonNull).
+		if strings.HasPrefix(target.Name(), "Get") && !f.Type.NonNull {
 			fieldNameWithoutGet := strings.TrimPrefix(target.Name(), "Get")
 			if haserMethod := b.findHaserMethod(obj.Type, fieldNameWithoutGet); haserMethod != nil {
 				// Validate the haser method signature: should return bool with no params (except optional context)
@@ -347,11 +346,9 @@ func (b *builder) findBindMethoderTarget(
 ) (types.Object, error) {
 	var directMatch types.Object
 	var getterMatch types.Object
-	var haserMatch types.Object
 	
-	// Try getter pattern (GetName) and haser pattern (HasName)
+	// Try getter pattern (GetName)
 	getterName := "Get" + name
-	haserName := "Has" + name
 	
 	for i := range methodCount {
 		method := methodFunc(i)
@@ -371,24 +368,17 @@ func (b *builder) findBindMethoderTarget(
 				return nil, fmt.Errorf("found more than one getter method to bind for %s", name)
 			}
 			getterMatch = method
-		} else if strings.EqualFold(method.Name(), haserName) {
-			// Check for haser pattern (lowest priority)
-			if haserMatch != nil {
-				return nil, fmt.Errorf("found more than one haser method to bind for %s", name)
-			}
-			haserMatch = method
 		}
 	}
 
-	// Return with priority: direct match > getter > haser
-	// Note: haser info is tracked separately in bindField
+	// Return with priority: direct match > getter
 	if directMatch != nil {
 		return directMatch, nil
 	}
 	if getterMatch != nil {
 		return getterMatch, nil
 	}
-	return haserMatch, nil
+	return nil, nil
 }
 
 // findHaserMethod looks for a HasX method for the given field name.

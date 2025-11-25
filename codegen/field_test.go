@@ -121,14 +121,6 @@ func (w WithGetter) GetName() string {
 	return w.name
 }
 
-type WithHaserOnly struct {
-	active *bool
-}
-
-func (w WithHaserOnly) HasActive() bool {
-	return w.active != nil
-}
-
 type WithBoth struct {
 	foobar *string
 }
@@ -145,7 +137,6 @@ func (w WithBoth) HasFoobar() bool {
 	require.NoError(t, err)
 
 	withGetter := scope.Lookup("WithGetter").Type().(*types.Named)
-	withHaserOnly := scope.Lookup("WithHaserOnly").Type().(*types.Named)
 	withBoth := scope.Lookup("WithBoth").Type().(*types.Named)
 
 	tests := []struct {
@@ -156,7 +147,6 @@ func (w WithBoth) HasFoobar() bool {
 		ShouldError bool
 	}{
 		{"Finds getter method for field name", withGetter, "Name", "GetName", false},
-		{"Finds haser method when only haser exists", withHaserOnly, "Active", "HasActive", false},
 		{"Prefers getter over haser when both exist", withBoth, "Foobar", "GetFoobar", false},
 	}
 
